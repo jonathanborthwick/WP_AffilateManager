@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    exit;
+}
 class AffiliateManager_DatabaseManager
 {
     /**
@@ -147,6 +149,10 @@ private function create_campaigns_table()
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             network_name varchar(255) NOT NULL,
             description text,
+            api_key varchar(255) NULL,
+            client_id varchar(255) NULL,
+            client_secret varchar(255) NULL,
+            access_token text NULL,
             url VARCHAR(2048) NULL,--eg clickbank.com
             PRIMARY KEY  (id)
         ) $charset_collate;";

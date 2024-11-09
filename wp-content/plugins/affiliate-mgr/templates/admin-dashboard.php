@@ -8,9 +8,11 @@ if (!defined('ABSPATH')) {
 $stats_manager = new AffiliateManager_StatsManager();
 $link_manager = new AffiliateManager_AffiliateLinkManager();
 $campaign_manager = new AffiliateManager_CampaignManager();
+$metrics_manager = new AffiliateManager_MetricsManager();
 
 $total_links = count($link_manager->get_links());
 $total_campaigns = count($campaign_manager->get_campaigns());
+$metrics = $metrics_manager->get_metrics_summary();
 
 // Display dashboard title
 ?>
@@ -23,6 +25,18 @@ $total_campaigns = count($campaign_manager->get_campaigns());
         <ul>
             <li><?php esc_html_e('Total Links:', 'affiliate-manager'); ?> <strong><?php echo esc_html($stats_manager->get_total_links()); ?></strong></li>
             <li><?php esc_html_e('Total Campaigns:', 'affiliate-manager'); ?> <strong><?php echo esc_html($stats_manager->get_total_campaigns()); ?></strong></li>
+        </ul>
+    </div>
+
+        <!-- Metrics Overview Section -->
+    <div class="affiliate-dashboard-metrics">
+        <h2><?php esc_html_e('Metrics Overview', 'affiliate-manager'); ?></h2>
+        <ul>
+            <li><?php esc_html_e('Total Clicks:', 'affiliate-manager'); ?> <strong><?php echo esc_html($metrics['total_clicks']); ?></strong></li>
+            <li><?php esc_html_e('Total Conversions:', 'affiliate-manager'); ?> <strong><?php echo esc_html($metrics['total_conversions']); ?></strong></li>
+            <li><?php esc_html_e('Total Revenue:', 'affiliate-manager'); ?> <strong><?php echo esc_html(number_format($metrics['total_revenue'], 2)); ?></strong></li>
+            <li><?php esc_html_e('Total Cost:', 'affiliate-manager'); ?> <strong><?php echo esc_html(number_format($metrics['total_cost'], 2)); ?></strong></li>
+            <li><?php esc_html_e('ROI:', 'affiliate-manager'); ?> <strong><?php echo esc_html(number_format($metrics['total_roi'], 2)); ?>%</strong></li>
         </ul>
     </div>
 

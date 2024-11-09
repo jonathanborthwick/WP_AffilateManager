@@ -323,7 +323,12 @@ CREATE TABLE `wpzw_aff_mgr_affiliate_metrics` (
 CREATE TABLE `wpzw_aff_mgr_affiliate_networks` (
   `id` mediumint(9) NOT NULL,
   `network_name` varchar(255) COLLATE utf8mb4_unicode_520_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_520_ci
+  `description` text COLLATE utf8mb4_unicode_520_ci,
+  `api_key` varchar(255) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
+  `client_id` varchar(255) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
+  `client_secret` varchar(255) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
+  `access_token` text COLLATE utf8mb4_unicode_520_ci DEFAULT NULL,
+  `url` varchar(2048) COLLATE utf8mb4_unicode_520_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
 --

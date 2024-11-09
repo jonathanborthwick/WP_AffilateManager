@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    exit;
+}
 class AffiliateManager_AffiliateLinkManager
 {
     /**
@@ -11,7 +13,7 @@ class AffiliateManager_AffiliateLinkManager
     public function get_link_by_shortcode($shortcode)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_links';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE shortcode = %s", $shortcode));
     }
 
@@ -24,7 +26,7 @@ class AffiliateManager_AffiliateLinkManager
     public function get_link_by_id($link_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_links';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $link_id));
     }
 
@@ -53,7 +55,7 @@ class AffiliateManager_AffiliateLinkManager
     public function add_link($link_name, $url, $shortcode, $network_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_links';
 
         return $wpdb->insert(
             $table_name,
@@ -80,7 +82,7 @@ class AffiliateManager_AffiliateLinkManager
     public function get_links()
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_links';
         return $wpdb->get_results("SELECT * FROM $table_name");
     }
 
@@ -97,7 +99,7 @@ class AffiliateManager_AffiliateLinkManager
     public function update_link($link_id, $link_name, $url, $shortcode, $network_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_links';
 
         return $wpdb->update(
             $table_name,
@@ -127,7 +129,7 @@ class AffiliateManager_AffiliateLinkManager
     public function delete_link($link_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_links';
         return $wpdb->delete($table_name, ['id' => $link_id], ['%d']) !== false;
     }
 }

@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    exit;
+}
 class AffiliateManager_NetworksManager
 {
 
@@ -63,7 +65,7 @@ public function get_all_networks()
     public function add_network($network_name, $description)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_networks';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_networks';
 
         return $wpdb->insert(
             $table_name,
@@ -86,7 +88,7 @@ public function get_all_networks()
     public function get_networks()
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_networks';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_networks';
         return $wpdb->get_results("SELECT * FROM $table_name");
     }
 
@@ -99,7 +101,7 @@ public function get_all_networks()
     public function get_network_by_id($network_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_networks';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_networks';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $network_id));
     }
 
@@ -114,7 +116,7 @@ public function get_all_networks()
     public function update_network($network_id, $network_name, $description)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_networks';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_networks';
 
         return $wpdb->update(
             $table_name,
@@ -140,7 +142,7 @@ public function get_all_networks()
     public function delete_network($network_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_networks';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_networks';
         return $wpdb->delete($table_name, ['id' => $network_id], ['%d']) !== false;
     }
 }

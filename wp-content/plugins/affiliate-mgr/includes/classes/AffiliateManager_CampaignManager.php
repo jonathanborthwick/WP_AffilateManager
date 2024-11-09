@@ -1,5 +1,7 @@
 <?php
-
+if (!defined('ABSPATH')) {
+    exit;
+}
 class AffiliateManager_CampaignManager
 {
     private $table_name;
@@ -7,7 +9,7 @@ class AffiliateManager_CampaignManager
     public function __construct()
     {
         global $wpdb;
-        $this->table_name = $wpdb->prefix . 'affiliate_campaigns';
+        $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
     }
 
   
@@ -22,7 +24,7 @@ class AffiliateManager_CampaignManager
     public function add_campaign($campaign_name, $description)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'affiliate_manager_campaigns';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
 
         return $wpdb->insert(
             $table_name,
@@ -103,7 +105,7 @@ class AffiliateManager_CampaignManager
 public function get_all_campaigns()
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'affiliate_manager_campaigns';
+    $table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
 
     $results = $wpdb->get_results("SELECT * FROM $table_name");
     if ($results) {
