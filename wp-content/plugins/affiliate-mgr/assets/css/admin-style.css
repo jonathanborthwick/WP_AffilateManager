@@ -1,15 +1,25 @@
-.wrap {
-    margin: 20px;
+.form-table th {
+    width: 150px; /* Adjust the width as needed */
+    padding: 10px;
+    vertical-align: top;
 }
 
-h1, h2 {
-    margin-bottom: 20px;
+.form-table td {
+    padding: 10px;
 }
 
-form .form-table th {
-    text-align: left;
+.form-table input[type="text"],
+.form-table textarea {
+    width: 100%;
+    max-width: 400px; /* Adjust max width as needed */
 }
 
-form .form-table td {
-    padding: 5px 0;
+.submit {
+    margin-top: 20px;
 }
+
+/* Adjust textarea height */
+.form-table textarea {
+    height: 100px;
+}
+

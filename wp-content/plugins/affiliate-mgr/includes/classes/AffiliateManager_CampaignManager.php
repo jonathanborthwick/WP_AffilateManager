@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 class AffiliateManager_CampaignManager
 {
     private $table_name;
@@ -12,31 +13,30 @@ class AffiliateManager_CampaignManager
         $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
     }
 
-  
-
     /**
      * Add a new affiliate campaign to the database.
      *
-     * @param string campaign_name
-     * @param string $description
+     * @param string $campaign_name The name of the campaign.
+     * @param string $description   The description of the campaign.
      * @return bool True on success, false on failure.
      */
     public function add_campaign($campaign_name, $description)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
 
         return $wpdb->insert(
-            $table_name,
+            $this->table_name,
             [
-                'campaign_name' => sanitize_text_field(campaign_name),
+                'campaign_name' => sanitize_text_field($campaign_name),
                 'description' => sanitize_textarea_field($description),
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql')
             ],
             [
-                '%s',
-                '%s'
+                '%s', // campaign_name
+                '%s', // description
+                '%s', // created_at
+                '%s'  // updated_at
             ]
         ) !== false;
     }
@@ -44,8 +44,8 @@ class AffiliateManager_CampaignManager
     /**
      * Update an existing campaign.
      *
-     * @param int $id
-     * @param array $data
+     * @param int   $id   The ID of the campaign to update.
+     * @param array $data The data to update.
      * @return bool True on success, false on failure.
      */
     public function update_campaign($id, $data)
@@ -58,9 +58,9 @@ class AffiliateManager_CampaignManager
                 'description' => sanitize_textarea_field($data['description']),
                 'updated_at' => current_time('mysql')
             ],
-            [ 'id' => (int) $id ],
-            [ '%s', '%s', '%s' ],
-            [ '%d' ]
+            ['id' => (int) $id],
+            ['%s', '%s', '%s'],
+            ['%d']
         );
 
         return ($result !== false);
@@ -69,20 +69,20 @@ class AffiliateManager_CampaignManager
     /**
      * Delete a campaign by ID.
      *
-     * @param int $id
+     * @param int $id The ID of the campaign to delete.
      * @return bool True on success, false on failure.
      */
     public function delete_campaign($id)
     {
         global $wpdb;
-        $result = $wpdb->delete($this->table_name, [ 'id' => (int) $id ], [ '%d' ]);
+        $result = $wpdb->delete($this->table_name, ['id' => (int) $id], ['%d']);
         return ($result !== false);
     }
 
     /**
      * Get campaigns based on filters.
      *
-     * @param array $filters
+     * @param array $filters Optional filters for querying campaigns.
      * @return array List of campaigns.
      */
     public function get_campaigns($filters = [])
@@ -98,21 +98,19 @@ class AffiliateManager_CampaignManager
     }
 
     /**
- * Retrieve all affiliate campaigns.
- *
- * @return array|object|null The result set or null on failure.
- */
-public function get_all_campaigns()
-{
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
+     * Retrieve all affiliate campaigns.
+     *
+     * @return array List of all campaigns.
+     */
+    public function get_all_campaigns()
+    {
+        global $wpdb;
 
-    $results = $wpdb->get_results("SELECT * FROM $table_name");
-    if ($results) {
-        return $results;
-    } else {
-        return [];
+        $results = $wpdb->get_results("SELECT * FROM {$this->table_name}");
+        if ($results) {
+            return $results;
+        } else {
+            return [];
+        }
     }
-}
-
 }

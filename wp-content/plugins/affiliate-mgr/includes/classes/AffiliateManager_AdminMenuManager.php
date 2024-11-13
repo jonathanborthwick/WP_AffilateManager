@@ -75,6 +75,14 @@ class AffiliateManager_AdminMenuManager
      */
     public function render_links_page()
     {
+        $networks_manager = new AffiliateManager_NetworksManager();
+        $linkManager = new AffiliateManager_AffiliateLinkManager();
+        // Handle form submissions and actions
+        $networks_manager->handle_form_submission();
+        // Fetch all networks to display
+        $networks = $networks_manager->get_all_networks();
+        $links = $linkManager->get_links();
+        // Load the template
         $template = plugin_dir_path(__FILE__) . '../../templates/links-management.php';
         if (file_exists($template)) {
             include $template;
@@ -137,16 +145,16 @@ class AffiliateManager_AdminMenuManager
     public function render_networks_page()
     {
         $networks_manager = new AffiliateManager_NetworksManager();
-        $networks_manager->handle_form_submission(); // Handle form submission
-
-        $networks = $networks_manager->get_all_networks(); // Fetch all networks
-
-        // Load the appropriate template
+        // Handle form submissions and actions
+        $networks_manager->handle_form_submission();
+        // Fetch all networks to display
+        $networks = $networks_manager->get_all_networks();
+        // Load the template
         $template = plugin_dir_path(__FILE__) . '../../templates/networks-management.php';
         if (file_exists($template)) {
-            include $template;
+           include $template;
         } else {
-            echo "Error: Template file not found for managing networks.";
+           echo '<div class="error"><p>' . esc_html__('Error: Template file not found for managing networks. Path: ', 'affiliate-manager') . esc_html($template) . '</p></div>';
         }
     }
 }

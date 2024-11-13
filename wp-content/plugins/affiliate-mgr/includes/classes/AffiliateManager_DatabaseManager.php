@@ -33,8 +33,9 @@ class AffiliateManager_DatabaseManager
             url text NOT NULL, -- This is where the redirect goes; i.e. the full affiliate link
             shortcode varchar(255) NOT NULL,--eg. the part after the domain name before the campaign id. Eg healthypills in healthypills1
             network_id mediumint(9) DEFAULT NULL,--*eg. Clickbank's id from the  aff_mgr_affiliate_networks table
-            category_id mediumint(9) NULL--foreign key to the aff_mgr_affiliate_categories table. May be null
-            campaign_id mediumint(9) NULL-- foreign key to the aff_mgr_affiliate_campaigns. May be null
+            category_id mediumint(9) NULL,--foreign key to the aff_mgr_affiliate_categories table. May be null
+            campaign_id mediumint(9) NULL,-- foreign key to the aff_mgr_affiliate_campaigns. May be null
+            created_at timestamp DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id)
         ) $charset_collate;";
 
@@ -66,29 +67,30 @@ private function create_traffic_sources_table()
 }
 
  /**
- * Create the campaigns table with traffic source link.
+ * Create the campaigns table
  */
 private function create_campaigns_table()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
+    $traffic_sources_table = $wpdb->prefix . 'aff_mgr_affiliate_traffic_sources';
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        offer_name varchar(255) NOT NULL,
-        description text, -- explain strategy used here
-        created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-        updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY  (id),
-        FOREIGN KEY (traffic_source_id) REFERENCES {$wpdb->prefix}aff_mgr_traffic_sources(id)
-    ) $charset_collate;";
+    $sql = "CREATE TABLE IF NOT EXISTS `$table_name` (
+        `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+        `campaign_name` varchar(255) NOT NULL,
+        `description` text, /* explain strategy used here */
+        `traffic_source_id` mediumint(9) NOT NULL,
+        `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`),
+        FOREIGN KEY (`traffic_source_id`) REFERENCES `$traffic_sources_table`(`id`)
+    ) ENGINE=InnoDB $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 }
-
 
 
     /**

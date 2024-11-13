@@ -64,9 +64,8 @@ $metrics = $metrics_manager->get_metrics_summary();
                         <tr>
                             <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($activity->date))); ?></td>
                             <td><?php echo esc_html($activity->short_code); ?></td>
-                            <td><?php echo esc_html($activity->offer_name); ?></td>
+                            <td><?php echo esc_html($activity->campaign_name); ?></td>
                             <td><?php echo esc_html($activity->source); ?></td>
-                            <td><?php echo esc_html($activity->shortcode); ?></td>
                         </tr>
                         <?php
                     }

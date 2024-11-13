@@ -13,8 +13,8 @@ class AffiliateManager_AffiliateLinkManager
     public function get_link_by_shortcode($shortcode)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_links';
-        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE shortcode = %s", $shortcode));
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
+        return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE short_code = %s", $shortcode));
     }
 
     /**
@@ -26,7 +26,7 @@ class AffiliateManager_AffiliateLinkManager
     public function get_link_by_id($link_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $link_id));
     }
 
@@ -55,14 +55,14 @@ class AffiliateManager_AffiliateLinkManager
     public function add_link($link_name, $url, $shortcode, $network_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
 
         return $wpdb->insert(
             $table_name,
             [
                 'link_name' => sanitize_text_field($link_name),
                 'url' => esc_url_raw($url),
-                'shortcode' => sanitize_text_field($shortcode),
+                'short_code' => sanitize_text_field($shortcode),
                 'network_id' => $network_id
             ],
             [
@@ -80,11 +80,36 @@ class AffiliateManager_AffiliateLinkManager
      * @return array List of links.
      */
     public function get_links()
-    {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_links';
-        return $wpdb->get_results("SELECT * FROM $table_name");
-    }
+{
+    global $wpdb;
+    $table_links = $wpdb->prefix . 'aff_mgr_affiliate_links';
+    $table_networks = $wpdb->prefix . 'aff_mgr_affiliate_networks';
+    $table_categories = $wpdb->prefix . 'aff_mgr_affiliate_categories';
+    $table_campaigns = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
+    
+    // Retrieve link information, including network name
+    $query = "
+        SELECT 
+        l.id, 
+        l.link_name, 
+        l.notes link_notes, 
+        l.short_code, 
+        l.url,  
+        n.network_name, 
+        n.description,
+        n.id network_id
+        FROM $table_links l 
+        LEFT JOIN $table_networks n 
+        ON l.network_id = n.id
+        LEFT JOIN $table_campaigns c
+        ON l.campaign_id = c.id
+        LEFT JOIN $table_categories cat
+        ON cat.id = l.category_id;
+    ";
+
+    return $wpdb->get_results($query);
+}
+
 
     /**
      * Update an existing affiliate link.
@@ -99,14 +124,14 @@ class AffiliateManager_AffiliateLinkManager
     public function update_link($link_id, $link_name, $url, $shortcode, $network_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
 
         return $wpdb->update(
             $table_name,
             [
                 'link_name' => sanitize_text_field($link_name),
                 'url' => esc_url_raw($url),
-                'shortcode' => sanitize_text_field($shortcode),
+                'short_code' => sanitize_text_field($shortcode),
                 'network_id' => $network_id
             ],
             ['id' => $link_id],
@@ -129,7 +154,7 @@ class AffiliateManager_AffiliateLinkManager
     public function delete_link($link_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_links';
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
         return $wpdb->delete($table_name, ['id' => $link_id], ['%d']) !== false;
     }
 }

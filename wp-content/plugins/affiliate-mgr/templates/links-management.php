@@ -2,20 +2,64 @@
     <h1>Manage Affiliate Links</h1>
     <p>Here you can manage all affiliate links, edit them, or view their shortcodes and QR codes.</p>
 
-    <h2>Add New Link</h2>
-    <form method="post" action="">
+    <?php
+    // Handle link editing if the action is 'edit'
+    if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
+        $link_id = intval($_GET['id']);
+        $link = $linkManager->get_link_by_id($link_id);
+    }
+
+    // Handle form submissions (adding or updating links)
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['add_link'])) {
+            $link_name = sanitize_text_field($_POST['link_name']);
+            $url = esc_url_raw($_POST['url']);
+            $shortcode = sanitize_text_field($_POST['shortcode']);
+            $network_id = intval($_POST['network_id']);
+            
+            $linkManager->add_link($link_name, $url, $shortcode, $network_id);
+            echo '<div class="updated"><p>Link added successfully.</p></div>';
+        } elseif (isset($_POST['update_link'])) {
+            $link_id = intval($_POST['link_id']);
+            $link_name = sanitize_text_field($_POST['link_name']);
+            $url = esc_url_raw($_POST['url']);
+            $shortcode = sanitize_text_field($_POST['shortcode']);
+            $network_id = intval($_POST['network_id']);
+            
+            $linkManager->update_link($link_id, $link_name, $url, $shortcode, $network_id);
+            echo '<div class="updated"><p>Link updated successfully.</p></div>';
+        }
+    }
+
+    // Handle deletion if the action is 'delete'
+    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+        $link_id = intval($_GET['id']);
+        $linkManager->delete_link($link_id);
+        echo '<div class="updated"><p>Link deleted successfully.</p></div>';
+    }
+
+    // Fetch all affiliate links
+    $links = $linkManager->get_links();
+
+// Include Networks Manager Class
+$networks_manager = new AffiliateManager_NetworksManager();
+    ?>
+
+    <h2><?php echo isset($link) ? 'Edit Link' : 'Add New Link'; ?></h2>
+    <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=affiliate_manager_links')); ?>">
+        <input type="hidden" name="link_id" value="<?php echo isset($link) ? esc_attr($link->id) : ''; ?>">
         <table class="form-table">
             <tr>
                 <th><label for="link_name">Link Name</label></th>
-                <td><input type="text" id="link_name" name="link_name" class="regular-text" required></td>
+                <td><input type="text" id="link_name" name="link_name" class="regular-text" required value="<?php echo isset($link) ? esc_attr($link->link_name) : ''; ?>"></td>
             </tr>
             <tr>
                 <th><label for="url">URL</label></th>
-                <td><input type="url" id="url" name="url" class="regular-text" required></td>
+                <td><input type="url" id="url" name="url" class="regular-text" required value="<?php echo isset($link) ? esc_attr($link->url) : ''; ?>"></td>
             </tr>
             <tr>
                 <th><label for="shortcode">Shortcode</label></th>
-                <td><input type="text" id="shortcode" name="shortcode" class="regular-text" required></td>
+                <td><input type="text" id="shortcode" name="shortcode" class="regular-text" required value="<?php echo isset($link) ? esc_attr($link->short_code) : ''; ?>"></td>
             </tr>
             <tr>
                 <th><label for="network_id">Affiliate Network</label></th>
@@ -23,14 +67,16 @@
                     <select id="network_id" name="network_id" class="regular-text">
                         <option value="">Select a Network</option>
                         <?php foreach ($networks as $network) : ?>
-                            <option value="<?php echo esc_attr($network->id); ?>"><?php echo esc_html($network->network_name); ?></option>
+                            <option value="<?php echo esc_attr($network->id); ?>" <?php echo (isset($link) && $link->network_id == $network->id) ? 'selected' : ''; ?>>
+                                <?php echo esc_html($network->network_name); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </td>
             </tr>
         </table>
         <p class="submit">
-            <input type="submit" name="add_link" id="add_link" class="button button-primary" value="Add Link">
+            <input type="submit" name="<?php echo isset($link) ? 'update_link' : 'add_link'; ?>" id="add_link" class="button button-primary" value="<?php echo isset($link) ? 'Save Link' : 'Add Link'; ?>">
         </p>
     </form>
 
@@ -42,8 +88,8 @@
                 <th scope="col">Link Name</th>
                 <th scope="col">URL</th>
                 <th scope="col">Shortcode</th>
-                <th scope="col">Affiliate Network</th> 
-                <th scope="col">QR Code</th> 
+                <th scope="col">Affiliate Network</th>
+                <th scope="col">QR Code</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
@@ -54,16 +100,15 @@
                         <td><?php echo esc_html($link->id); ?></td>
                         <td><?php echo esc_html($link->link_name); ?></td>
                         <td><a href="<?php echo esc_url($link->url); ?>" target="_blank"><?php echo esc_html($link->url); ?></a></td>
-                        <td><?php echo esc_html(home_url('/' . $link->shortcode)); ?></td>
+                        <td><?php echo esc_html($link->short_code); ?></td>
                         <td>
                             <?php 
-                            $network = $networksManager->get_network_by_id($link->network_id);
+                            $network = $networks_manager->get_network_by_id($link->network_id);
                             echo $network ? esc_html($network->network_name) : esc_html__('No network assigned', 'affiliate-manager');
                             ?>
                         </td>
                         <td>
-                            <?php $qr_code_url = $linkManager->generate_qr_code(home_url('/' . $link->shortcode)); ?>
-                            <img src="<?php echo esc_url($qr_code_url); ?>" alt="QR Code" width="50" height="50">
+                            <!-- Placeholder for QR code if needed in future -->
                         </td>
                         <td>
                             <a href="admin.php?page=affiliate_manager_links&action=edit&id=<?php echo esc_attr($link->id); ?>" class="button">Edit</a>

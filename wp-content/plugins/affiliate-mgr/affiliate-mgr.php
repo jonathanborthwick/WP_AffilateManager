@@ -17,14 +17,18 @@ define('AFFILIATE_MGR_PLUGIN_DIR', plugin_dir_path(__FILE__));
 // Autoloader for classes.
 function affiliate_manager_autoload($class_name)
 {
-    if (false !== strpos($class_name, 'AffiliateManager')) {
+    if (strpos($class_name, 'AffiliateManager_') === 0) {
         $file = AFFILIATE_MGR_PLUGIN_DIR . 'includes/classes/' . $class_name . '.php';
         if (file_exists($file)) {
             include $file;
+        } else {
+            // Optional: Log an error if the file doesn't exist
+            error_log("Autoloader error: Class file not found for {$class_name} at {$file}");
         }
     }
 }
 spl_autoload_register('affiliate_manager_autoload');
+
 
 // Activation hook - setup database.
 register_activation_hook(__FILE__, 'affiliate_manager_activate');

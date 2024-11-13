@@ -38,12 +38,14 @@ class AffiliateManager_StatsManager
     public function get_recent_affiliate_activities()
     {
         global $wpdb;
-        $sql = "SELECT a.short_code, a.created_at, c.offer_name, n.network_name ";
+        $sql = "SELECT a.short_code, a.created_at, c.campaign_name, n.network_name, s.referrer_url AS source ";
         $sql.="FROM wpzw_aff_mgr_affiliate_links a ";
         $sql.="JOIN wpzw_aff_mgr_affiliate_campaigns c ";
         $sql.="ON a.campaign_id = c.id ";
         $sql.="JOIN wpzw_aff_mgr_affiliate_networks n ";
         $sql.="ON a.network_id = n.id ";
+        $sql.="JOIN wpzw_aff_mgr_affiliate_traffic_sources s ";
+        $sql.="ON s.campaign_id = c.id ";
         $sql.="ORDER BY a.created_at desc LIMIT 10;";
         return $wpdb->get_results($sql);
     }
