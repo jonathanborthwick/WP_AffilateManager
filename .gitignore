@@ -12,6 +12,10 @@ vendor/
 # Ignore the wordpress directory
 wordpress/
 
+#ignore the composer files used by Visual Studio Code
+composer.json
+composer.lock
+
 /wp-admin/
 /wp-content/index.php
 /wp-content/languages
