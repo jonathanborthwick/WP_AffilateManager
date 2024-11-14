@@ -5,6 +5,13 @@
 #
 # Note: if you want to stage/commit WP core files
 # you can delete this whole section/until Configuration.
+
+# Ignore the vendor directory
+vendor/
+
+# Ignore the wordpress directory
+wordpress/
+
 /wp-admin/
 /wp-content/index.php
 /wp-content/languages
