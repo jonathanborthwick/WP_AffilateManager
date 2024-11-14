@@ -9,12 +9,78 @@ class AffiliateManager_DatabaseManager
      */
     public function create_tables()
     {
+        $this->create_settings_table();
+        $this->insert_default_settings(); // Insert default settings
         $this->create_affiliate_links_table();
         $this->create_traffic_sources_table();
         $this->create_campaigns_table();
         $this->create_categories_table();
         $this->create_metrics_table();
         $this->create_networks_table(); // Add networks table creation
+    }
+
+ /**
+     * Create the settings table.
+     */
+    private function create_settings_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aff_mgr_settings';
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            setting_key varchar(255) NOT NULL,
+            setting_value text NOT NULL,
+            PRIMARY KEY  (id),
+            UNIQUE KEY setting_key (setting_key)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+    /**
+     * Insert default settings into the settings table.
+     */
+    private function insert_default_settings()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aff_mgr_settings';
+
+        // Check if the default settings exist before inserting them
+        $not_found_page_type = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $table_name WHERE setting_key = %s", 'not-found-page-local-or-remote'));
+        if ($not_found_page_type === null) {
+            // Insert default for 'not-found-page-local-or-remote'
+            $wpdb->insert(
+                $table_name,
+                [
+                    'setting_key' => 'not-found-page-local-or-remote',
+                    'setting_value' => 'local'
+                ],
+                [
+                    '%s',
+                    '%s'
+                ]
+            );
+        }
+
+        $offer_not_found = $wpdb->get_var($wpdb->prepare("SELECT setting_value FROM $table_name WHERE setting_key = %s", 'offer-not-found'));
+        if ($offer_not_found === null) {
+            // Insert default for 'offer-not-found'
+            $wpdb->insert(
+                $table_name,
+                [
+                    'setting_key' => 'offer-not-found',
+                    'setting_value' => 'offer-not-found' // This is the local slug name
+                ],
+                [
+                    '%s',
+                    '%s'
+                ]
+            );
+        }
     }
 
     /**

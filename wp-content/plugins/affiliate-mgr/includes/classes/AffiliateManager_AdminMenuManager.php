@@ -55,7 +55,29 @@ class AffiliateManager_AdminMenuManager
             'affiliate_manager_networks',  // Menu slug
             [$this, 'render_networks_page'] // Callback function
         );
+
+        add_submenu_page(
+            'affiliate_manager_dashboard', // Parent slug
+            'Affiliate Manager Settings',  // Page title
+            'Affiliate Manager Settings',  // Menu title
+            'manage_options',              // Capability
+            'affiliate_manager_settings',  // Menu slug
+            [$this, 'render_settings_page'] // Callback function
+        );
     }
+
+/**
+ * Render the settings page
+ */
+public function render_settings_page()
+{
+    $template = plugin_dir_path(__FILE__) . '../../templates/settings-management.php';
+    if (file_exists($template)) {
+        include $template;
+    } else {
+        echo '<div class="error"><p>' . esc_html__('Error: Template file not found for the dashboard. Path: ', 'affiliate-manager') . esc_html($template) . '</p></div>';
+    }
+}
 
     /**
      * Render the dashboard page.
