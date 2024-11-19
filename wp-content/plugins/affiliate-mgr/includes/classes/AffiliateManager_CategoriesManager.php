@@ -12,6 +12,34 @@ class AffiliateManager_CategoriesManager
         $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_categories';
     }
 
+    public function get_category($id)
+    {
+        global $wpdb;
+    
+        $query = $wpdb->prepare("SELECT * FROM {$this->table_name} WHERE id = %d", $id);
+        return $wpdb->get_row($query);
+    }
+    
+    public function update_category($id, $data)
+{
+    global $wpdb;
+
+    $result = $wpdb->update(
+        $this->table_name,
+        [
+            'name' => sanitize_text_field($data['name']),
+            'notes' => sanitize_textarea_field($data['notes']),
+            'updated_at' => current_time('mysql')
+        ],
+        ['id' => (int) $id],
+        ['%s', '%s', '%s'],
+        ['%d']
+    );
+
+    return ($result !== false);
+}
+
+
     /**
      * Get all categories from the database.
      *

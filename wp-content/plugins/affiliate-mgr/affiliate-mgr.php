@@ -89,13 +89,19 @@ function affiliate_mgr_query_vars($vars)
 add_action('template_redirect', 'affiliate_mgr_handle_shortcode_redirect');
 function affiliate_mgr_handle_shortcode_redirect()
 {
-
+    if (is_admin()) {
+        return;
+    }
     // error_log("Redirect handler called."); // Check if the function is called
 
     $shortcode = get_query_var('affiliate_shortcode');
+    if (empty($shortcode)) {
+        error_log("shortcode variable is empty");
+        return;
+    }
     //error_log("Shortcode value: " . $shortcode); // Log the shortcode value
 
-    if (!empty($shortcode)) {
+
         // Fetch your URL from the database based on $shortcode and perform redirect
         global $wpdb;
         $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
@@ -122,7 +128,22 @@ function affiliate_mgr_handle_shortcode_redirect()
             }
             exit();
         }
-    } else {
-        error_log("shortcode variable is empty");
+
+}
+
+// Enqueue the general validation JavaScript file.
+function affiliate_manager_enqueue_scripts() {
+    $screen = get_current_screen();
+    if ($screen->id === 'toplevel_page_affiliate_manager_settings') {
+        wp_enqueue_script(
+            'affiliate-manager-validation',
+            plugin_dir_url(__FILE__) . 'assets/js/am.validation.js', // Adjust the path to where your JavaScript file is located.
+            [],
+            '1.0.0',
+            true // Load in footer.
+        );
     }
 }
+add_action('admin_enqueue_scripts', 'affiliate_manager_enqueue_scripts');
+
+

@@ -52,7 +52,7 @@ class AffiliateManager_AffiliateLinkManager
      * @param int $network_id
      * @return bool True on success, false on failure.
      */
-    public function add_link($link_name, $url, $shortcode, $network_id)
+    public function add_link($link_name, $url, $shortcode, $network_id,$campaign_id)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
@@ -63,12 +63,14 @@ class AffiliateManager_AffiliateLinkManager
                 'link_name' => sanitize_text_field($link_name),
                 'url' => esc_url_raw($url),
                 'short_code' => sanitize_text_field($shortcode),
-                'network_id' => $network_id
+                'network_id' => $network_id,
+                'campaign_id' => $campaign_id
             ],
             [
                 '%s',
                 '%s',
                 '%s',
+                '%d',
                 '%d'
             ]
         ) !== false;
@@ -97,7 +99,8 @@ class AffiliateManager_AffiliateLinkManager
         l.url,  
         n.network_name, 
         n.description,
-        n.id network_id
+        n.id network_id, 
+        c.id campaign_id 
         FROM $table_links l 
         LEFT JOIN $table_networks n 
         ON l.network_id = n.id
@@ -121,7 +124,7 @@ class AffiliateManager_AffiliateLinkManager
      * @param int $network_id
      * @return bool True on success, false on failure.
      */
-    public function update_link($link_id, $link_name, $url, $shortcode, $network_id)
+    public function update_link($link_id, $link_name, $url, $shortcode, $network_id, $campaign_id)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'aff_mgr_affiliate_links';
@@ -132,13 +135,15 @@ class AffiliateManager_AffiliateLinkManager
                 'link_name' => sanitize_text_field($link_name),
                 'url' => esc_url_raw($url),
                 'short_code' => sanitize_text_field($shortcode),
-                'network_id' => $network_id
+                'network_id' => $network_id,
+                'campaign_id' => $campaign_id
             ],
             ['id' => $link_id],
             [
                 '%s',
                 '%s',
                 '%s',
+                '%d',
                 '%d'
             ],
             ['%d']

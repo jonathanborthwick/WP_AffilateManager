@@ -25,10 +25,20 @@ class AffiliateManager_RedirectHandler
         $link = $this->get_link_by_slug($slug);
 
         if ($link) {
+             // Track referral source
+            $metrics_manager = new AffiliateManager_MetricsManager();
+            $metrics_manager->increment_click($link->id);
+
+            // Track referral source
+            $referral = isset($_SERVER['HTTP_REFERER']) ? sanitize_text_field($_SERVER['HTTP_REFERER']) : 'Direct';
+            $metrics_manager->track_referral($link->id, $referral);
+
             wp_redirect(esc_url_raw($link->url), 301);
             exit;
         }
     }
+
+    
 
     /**
      * Retrieve affiliate link by slug.
@@ -39,7 +49,7 @@ class AffiliateManager_RedirectHandler
     private function get_link_by_slug($slug)
     {
         global $wpdb;
-        $query = $wpdb->prepare("SELECT * FROM {$this->table_name} WHERE link_name = %s LIMIT 1", $slug);
+        $query = $wpdb->prepare("SELECT * FROM {$this->table_name} WHERE short_code = %s LIMIT 1", $slug);
         return $wpdb->get_row($query);
     }
 }

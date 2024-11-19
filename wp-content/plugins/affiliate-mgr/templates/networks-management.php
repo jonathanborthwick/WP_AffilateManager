@@ -64,7 +64,7 @@ $networks = $networks_manager->get_all_networks();
 
 
 
-    <h2>Existing Campaigns</h2>
+    <h2>Existing Networks</h2>
     <table class="wp-list-table widefat fixed striped">
         <thead>
             <tr>

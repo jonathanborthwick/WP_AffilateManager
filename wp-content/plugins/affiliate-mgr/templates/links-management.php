@@ -16,8 +16,9 @@
             $url = esc_url_raw($_POST['url']);
             $shortcode = sanitize_text_field($_POST['shortcode']);
             $network_id = intval($_POST['network_id']);
+            $campaign_id = intval($_POST['campaign_id']);
             
-            $linkManager->add_link($link_name, $url, $shortcode, $network_id);
+            $linkManager->add_link($link_name, $url, $shortcode, $network_id,$campaign_id);
             echo '<div class="updated"><p>Link added successfully.</p></div>';
         } elseif (isset($_POST['update_link'])) {
             $link_id = intval($_POST['link_id']);
@@ -25,8 +26,9 @@
             $url = esc_url_raw($_POST['url']);
             $shortcode = sanitize_text_field($_POST['shortcode']);
             $network_id = intval($_POST['network_id']);
+            $campaign_id = intval($_POST['campaign_id']);
             
-            $linkManager->update_link($link_id, $link_name, $url, $shortcode, $network_id);
+            $linkManager->update_link($link_id, $link_name, $url, $shortcode, $network_id,$campaign_id);
             echo '<div class="updated"><p>Link updated successfully.</p></div>';
         }
     }
@@ -41,8 +43,10 @@
     // Fetch all affiliate links
     $links = $linkManager->get_links();
 
-// Include Networks Manager Class
+
 $networks_manager = new AffiliateManager_NetworksManager();
+$campaign_manager = new AffiliateManager_CampaignManager();
+$campaigns = $campaign_manager->get_all_campaigns();
     ?>
 
     <h2><?php echo isset($link) ? 'Edit Link' : 'Add New Link'; ?></h2>
@@ -74,6 +78,19 @@ $networks_manager = new AffiliateManager_NetworksManager();
                     </select>
                 </td>
             </tr>
+            <tr>
+                <th><label for="campaign">Campaign</label></th>
+                <td>
+                    <select id="campaign_id" name="campaign_id" class="regular-text">
+                    <option value="">Select a Campaign</option>
+                    <?php foreach ($campaigns as $campaign) : ?>
+                            <option value="<?php echo esc_attr($campaign->id); ?>" <?php echo (isset($link) && $link->campaign_id == $campaign->id) ? 'selected' : ''; ?>>
+                                <?php echo esc_html($campaign->campaign_name); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+            </tr>
         </table>
         <p class="submit">
             <input type="submit" name="<?php echo isset($link) ? 'update_link' : 'add_link'; ?>" id="add_link" class="button button-primary" value="<?php echo isset($link) ? 'Save Link' : 'Add Link'; ?>">
@@ -89,6 +106,7 @@ $networks_manager = new AffiliateManager_NetworksManager();
                 <th scope="col">URL</th>
                 <th scope="col">Shortcode</th>
                 <th scope="col">Affiliate Network</th>
+                <th scope="col">Campaign</th>
                 <th scope="col">QR Code</th>
                 <th scope="col">Actions</th>
             </tr>
@@ -108,7 +126,13 @@ $networks_manager = new AffiliateManager_NetworksManager();
                             ?>
                         </td>
                         <td>
-                            <!-- Placeholder for QR code if needed in future -->
+                            <?php
+                            $campaign = $campaign_manager->get_campaign_by_id($link->campaign_id);
+                            echo $campaign ? esc_html($campaign->campaign_name) : esc_html__('No campaign assigned','campaign-manager');
+                            ?>
+                        </td>
+                        <td>
+                            <!-- Placeholder for QR code : todo! -->
                         </td>
                         <td>
                             <a href="admin.php?page=affiliate_manager_links&action=edit&id=<?php echo esc_attr($link->id); ?>" class="button">Edit</a>

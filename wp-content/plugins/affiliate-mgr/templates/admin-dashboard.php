@@ -1,93 +1,56 @@
 <?php
-// Check if accessed directly, exit if true for security
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Include Stats Manager Class
-$stats_manager = new AffiliateManager_StatsManager();
-$link_manager = new AffiliateManager_AffiliateLinkManager();
-$campaign_manager = new AffiliateManager_CampaignManager();
 $metrics_manager = new AffiliateManager_MetricsManager();
-
-$total_links = count($link_manager->get_links());
-$total_campaigns = count($campaign_manager->get_campaigns());
-$metrics = $metrics_manager->get_metrics_summary();
-
-// Display dashboard title
+$metrics_summary = $metrics_manager->get_metrics_summary();
+$recent_activity = $metrics_manager->get_recent_activity();
 ?>
+
 <div class="wrap">
-    <h1><?php esc_html_e('Affiliate Manager Dashboard', 'affiliate-manager'); ?></h1>
+   <h1><?php esc_html_e('Affiliate Manager Dashboard', 'affiliate-manager'); ?></h1>
 
-    <!-- Quick Stats Section -->
-    <div class="affiliate-dashboard-stats">
-        <h2><?php esc_html_e('Quick Stats', 'affiliate-manager'); ?></h2>
-        <ul>
-            <li><?php esc_html_e('Total Links:', 'affiliate-manager'); ?> <strong><?php echo esc_html($stats_manager->get_total_links()); ?></strong></li>
-            <li><?php esc_html_e('Total Campaigns:', 'affiliate-manager'); ?> <strong><?php echo esc_html($stats_manager->get_total_campaigns()); ?></strong></li>
-        </ul>
-    </div>
+    <h2><?php esc_html_e('Quick Stats', 'affiliate-manager'); ?></h2>
+    <p><?php esc_html_e('Total Links:', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_links'] ?? 0); ?></p>
+    <p><?php esc_html_e('Total Campaigns:', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_campaigns'] ?? 0); ?></p>
 
-        <!-- Metrics Overview Section -->
-    <div class="affiliate-dashboard-metrics">
-        <h2><?php esc_html_e('Metrics Overview', 'affiliate-manager'); ?></h2>
-        <ul>
-            <li><?php esc_html_e('Total Clicks:', 'affiliate-manager'); ?> <strong><?php echo esc_html($metrics['total_clicks']); ?></strong></li>
-            <li><?php esc_html_e('Total Conversions:', 'affiliate-manager'); ?> <strong><?php echo esc_html($metrics['total_conversions']); ?></strong></li>
-            <li><?php esc_html_e('Total Revenue:', 'affiliate-manager'); ?> <strong><?php echo esc_html(number_format($metrics['total_revenue'], 2)); ?></strong></li>
-            <li><?php esc_html_e('Total Cost:', 'affiliate-manager'); ?> <strong><?php echo esc_html(number_format($metrics['total_cost'], 2)); ?></strong></li>
-            <li><?php esc_html_e('ROI:', 'affiliate-manager'); ?> <strong><?php echo esc_html(number_format($metrics['total_roi'], 2)); ?>%</strong></li>
-        </ul>
-    </div>
-
-    <!-- Recent Activity Section -->
-    <div class="affiliate-dashboard-recent-activity">
-        <h2><?php esc_html_e('Recent Activity', 'affiliate-manager'); ?></h2>
-        <table class="widefat fixed">
-            <thead>
+    <h2><?php esc_html_e('Metrics Overview', 'affiliate-manager'); ?></h2>
+    <p><?php esc_html_e('Total redirects (\'clicks\' off site):', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_clicks']); ?></p>
+    <p>Coming soon: Total Conversions,Total Revenue, Total Cost, ROI and recent activity section</p>
+<!--
+    <p><?php esc_html_e('Total Conversions:', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_conversions']); ?></p>
+    <p><?php esc_html_e('Total Revenue:', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_revenue']); ?></p>
+    <p><?php esc_html_e('Total Cost:', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_cost']); ?></p>
+    <p><?php esc_html_e('ROI:', 'affiliate-manager'); ?> <?php echo esc_html($metrics_summary['total_roi']); ?>%</p>
+-->
+    <!--
+    <h2><?php esc_html_e('Recent Activity', 'affiliate-manager'); ?></h2>
+    <table class="wp-list-table widefat fixed striped">
+    <thead>
+        <tr>
+            <th><?php esc_html_e('Date', 'affiliate-manager'); ?></th>
+            <th><?php esc_html_e('Affiliate', 'affiliate-manager'); ?></th>
+            <th><?php esc_html_e('Source', 'affiliate-manager'); ?></th>
+            <th><?php esc_html_e('Shortcode', 'affiliate-manager'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($recent_activity)) : ?>
+            <?php foreach ($recent_activity as $activity) : ?>
                 <tr>
-                    <th><?php esc_html_e('Date', 'affiliate-manager'); ?></th>
-                    <th><?php esc_html_e('Affiliate', 'affiliate-manager'); ?></th>
-                    <th><?php esc_html_e('Campaign', 'affiliate-manager'); ?></th>
-                    <th><?php esc_html_e('Source', 'affiliate-manager'); ?></th>
-                    <th><?php esc_html_e('Shortcode', 'affiliate-manager'); ?></th>
+                    <td><?php echo esc_html($activity->created_at); ?></td>
+                    <td><?php echo esc_html($activity->link_name); ?></td>
+                    <td><?php echo esc_html($activity->source); ?></td>
+                    <td><?php echo esc_html($activity->short_code); ?></td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch recent activity
-                $activities = $stats_manager->get_recent_affiliate_activities();
-
-                if (!empty($activities)) {
-                    foreach ($activities as $activity) {
-                        ?>
-                        <tr>
-                            <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($activity->date))); ?></td>
-                            <td><?php echo esc_html($activity->short_code); ?></td>
-                            <td><?php echo esc_html($activity->campaign_name); ?></td>
-                            <td><?php echo esc_html($activity->source); ?></td>
-                        </tr>
-                        <?php
-                    }
-                } else {
-                    ?>
-                    <tr>
-                        <td colspan="5"><?php esc_html_e('No recent activity.', 'affiliate-manager'); ?></td>
-                    </tr>
-                    <?php
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Quick Links Section -->
-    <div class="affiliate-dashboard-links">
-        <h2><?php esc_html_e('Quick Links', 'affiliate-manager'); ?></h2>
-        <ul>
-            <li><a href="<?php echo admin_url('admin.php?page=affiliate_manager_links'); ?>"><?php esc_html_e('Manage Links', 'affiliate-manager'); ?></a></li>
-            <li><a href="<?php echo admin_url('admin.php?page=affiliate_manager_campaigns'); ?>"><?php esc_html_e('Manage Campaigns', 'affiliate-manager'); ?></a></li>
-            <li><a href="<?php echo admin_url('admin.php?page=affiliate_manager_categories'); ?>"><?php esc_html_e('Manage Categories', 'affiliate-manager'); ?></a></li>
-        </ul>
-    </div>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <tr>
+                <td colspan="4"><?php esc_html_e('No recent activity.', 'affiliate-manager'); ?></td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+        -->
 </div>

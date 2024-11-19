@@ -13,6 +13,61 @@ class AffiliateManager_MetricsManager
         $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_metrics';
     }
 
+    public function increment_click($link_id)
+{
+    global $wpdb;
+
+    // Check if metrics record exists
+    $query = $wpdb->prepare("SELECT id FROM {$this->table_name} WHERE link_id = %d", $link_id);
+    $record = $wpdb->get_var($query);
+
+    if ($record) {
+        // Increment click count
+        $wpdb->query($wpdb->prepare("UPDATE {$this->table_name} SET clicks = clicks + 1 WHERE link_id = %d", $link_id));
+    } else {
+        // Insert new record
+        $wpdb->insert($this->table_name, [
+            'link_id' => $link_id,
+            'clicks' => 1,
+            'conversions' => 0,
+            'earnings' => 0.00,
+        ], ['%d', '%d', '%d', '%f']);
+    }
+}
+
+public function get_recent_activity($limit = 10)
+{
+    global $wpdb;
+    $referral_table = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
+    $links_table = $wpdb->prefix . 'aff_mgr_affiliate_links';
+
+    $query = "
+        SELECT r.created_at, l.link_name, r.source, l.short_code
+        FROM {$referral_table} r
+        INNER JOIN {$links_table} l ON r.link_id = l.id
+        ORDER BY r.created_at DESC
+        LIMIT %d
+    ";
+
+    $results = $wpdb->get_results($wpdb->prepare($query, $limit));
+
+    return $results;
+}
+
+
+public function track_referral($link_id, $source)
+{
+    global $wpdb;
+    $referral_table = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
+
+    $wpdb->insert($referral_table, [
+        'link_id' => $link_id,
+        'source' => $source,
+        'created_at' => current_time('mysql')
+    ], ['%d', '%s', '%s']);
+}
+
+
     /**
      * Get a summary of all metrics.
      *

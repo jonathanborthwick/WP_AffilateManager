@@ -16,8 +16,29 @@ class AffiliateManager_DatabaseManager
         $this->create_campaigns_table();
         $this->create_categories_table();
         $this->create_metrics_table();
-        $this->create_networks_table(); // Add networks table creation
+        $this->create_referrals_table();
+        $this->create_networks_table(); 
     }
+
+    public function create_referrals_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
+    
+        $charset_collate = $wpdb->get_charset_collate();
+    
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            link_id mediumint(9) NOT NULL,
+            source varchar(2048) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
+    
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+    
 
  /**
      * Create the settings table.
@@ -160,25 +181,28 @@ private function create_campaigns_table()
 
 
     /**
-     * Create the categories table.
-     */
-    private function create_categories_table()
-    {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'aff_mgr_affiliate_categories';
+ * Create the categories table.
+ */
+private function create_categories_table()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'aff_mgr_affiliate_categories';
 
-        $charset_collate = $wpdb->get_charset_collate();
+    $charset_collate = $wpdb->get_charset_collate();
 
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            category_name varchar(255) NOT NULL,
-            description text,
-            PRIMARY KEY  (id)
-        ) $charset_collate;";
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        name varchar(255) NOT NULL,
+        notes text,
+        created_at datetime DEFAULT CURRENT_TIMESTAMP,
+        updated_at datetime DEFAULT NULL,
+        PRIMARY KEY  (id)
+    ) $charset_collate;";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+
 
     /**
      * Create the metrics table.

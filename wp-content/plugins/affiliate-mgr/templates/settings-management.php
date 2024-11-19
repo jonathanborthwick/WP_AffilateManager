@@ -12,7 +12,8 @@ $offer_not_found_url = $settings_manager->get_setting('offer-not-found');
     <h1>Affiliate Manager Settings</h1>
     <p>Here you can manage all of the settings for the plugin</p>
     
-    <form method="post" action="">
+    <!-- Add an id to the form to identify it for JavaScript validation -->
+    <form id="affiliate-settings-form" method="post" action="">
         <?php wp_nonce_field('affiliate_mgr_settings_save', 'affiliate_mgr_settings_nonce'); ?>
 
         <table class="form-table">
@@ -35,6 +36,7 @@ $offer_not_found_url = $settings_manager->get_setting('offer-not-found');
                 <td>
                     <input type="text" id="offer_not_found_url" name="offer_not_found_url" value="<?php echo esc_attr($offer_not_found_url); ?>" class="regular-text">
                     <p class="description">URL to redirect to when an offer is not found.</p>
+                    <p id="offer-not-found-warning" style="display: none; color: red;">Please enter a valid URL when using the "Remote" option.</p>
                 </td>
             </tr>
         </table>
@@ -44,10 +46,12 @@ $offer_not_found_url = $settings_manager->get_setting('offer-not-found');
 </div>
 
 <?php
+// Handle the form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['affiliate_mgr_settings_nonce']) && wp_verify_nonce($_POST['affiliate_mgr_settings_nonce'], 'affiliate_mgr_settings_save')) {
     $new_offer_not_found_page_type = sanitize_text_field($_POST['offer_not_found_page_type']);
     $new_offer_not_found_url = esc_url_raw(trim($_POST['offer_not_found_url']));
 
+    // Save the settings to the database
     $settings_manager->update_setting('not-found-page-local-or-remote', $new_offer_not_found_page_type);
     $settings_manager->update_setting('offer-not-found', $new_offer_not_found_url);
 
@@ -55,3 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['affiliate_mgr_setting
 }
 ?>
 
+<script>
+// Initialize JavaScript validation when the DOM content is loaded.
+document.addEventListener('DOMContentLoaded', function() {
+    am.validation.init();
+});
+</script>

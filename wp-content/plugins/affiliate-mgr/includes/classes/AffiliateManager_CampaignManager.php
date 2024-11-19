@@ -13,6 +13,15 @@ class AffiliateManager_CampaignManager
         $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_campaigns';
     }
 
+    public function get_campaign($id)
+    {
+        global $wpdb;
+    
+        $query = $wpdb->prepare("SELECT * FROM {$this->table_name} WHERE id = %d", $id);
+        return $wpdb->get_row($query);
+    }
+    
+
     /**
      * Add a new affiliate campaign to the database.
      *
@@ -95,6 +104,14 @@ class AffiliateManager_CampaignManager
         }
 
         return $wpdb->get_results($query);
+    }
+
+    public function get_campaign_by_id($campaign_id)
+    {
+        global $wpdb;
+        $query = $wpdb->prepare("SELECT * FROM {$this->table_name} WHERE id = %d", $campaign_id);
+        $result = $wpdb->get_row($query);
+        return $result ? $result : null;
     }
 
     /**
