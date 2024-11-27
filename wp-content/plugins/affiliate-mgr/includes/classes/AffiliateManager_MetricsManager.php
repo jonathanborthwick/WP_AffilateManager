@@ -13,32 +13,91 @@ class AffiliateManager_MetricsManager
         $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_metrics';
     }
 
-    public function increment_click($link_id)
-{
-    global $wpdb;
+    /**
+     * Insert the link id and source to the referals table
+     */
+    public function track_referral($link_id, $source)
+    {
+        global $wpdb;
+        $referral_table = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
 
-    // Check if metrics record exists
-    $query = $wpdb->prepare("SELECT id FROM {$this->table_name} WHERE link_id = %d", $link_id);
-    $record = $wpdb->get_var($query);
-
-    if ($record) {
-        // Increment click count
-        $wpdb->query($wpdb->prepare("UPDATE {$this->table_name} SET clicks = clicks + 1 WHERE link_id = %d", $link_id));
-    } else {
-        // Insert new record
-        $wpdb->insert($this->table_name, [
-            'link_id' => $link_id,
-            'clicks' => 1,
-            'conversions' => 0,
-            'earnings' => 0.00,
-        ], ['%d', '%d', '%d', '%f']);
+        $wpdb->insert
+        (
+            $referral_table, 
+            [
+              'link_id' => $link_id,
+              'source' => $source,
+              'created_at' => current_time('mysql')
+            ],
+            ['%d', '%s', '%s']
+        );
     }
-}
 
-public function get_recent_activity($limit = 10)
-{
-    global $wpdb;
-    $referral_table = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
+    public function increment_click($link_id)
+    {
+        global $wpdb;
+        // Check if metrics record exists in the metrics table
+        $query = $wpdb->prepare("SELECT id FROM {$this->table_name} WHERE link_id = %d", $link_id);
+        $record = $wpdb->get_var($query);
+        if ($record) {
+            $result = $wpdb->query($wpdb->prepare("UPDATE {$this->table_name} SET clicks = clicks + 1 WHERE link_id = %d", $link_id));
+            if ($result === false) {
+                error_log('Failed to update click count for link ID: ' . $link_id);
+            }
+        } else {
+            $result = $wpdb->insert($this->table_name, [
+                'link_id' => $link_id,
+                'clicks' => 1,
+                'conversions' => 0,
+                'earnings' => 0.00,
+            ], ['%d', '%d', '%d', '%f']);
+            if ($result === false) {
+                error_log('Failed to insert new metrics record for link ID: ' . $link_id);
+            }
+        }
+        
+    }
+
+    /**
+     * total_links, total_campaigns,total_clicks
+     */
+    public function get_metrics_summary()
+    {
+        global $wpdb;
+        $query = "SELECT 
+             COUNT(l.id) AS total_links, 
+             COUNT(DISTINCT c.id) AS total_campaigns, 
+             COUNT(r.id) AS total_clicks
+         FROM 
+             " . $wpdb->prefix . "aff_mgr_affiliate_links l
+         LEFT JOIN 
+             " . $wpdb->prefix . "aff_mgr_affiliate_campaigns c 
+         ON l.campaign_id = c.id
+         LEFT JOIN 
+             " . $wpdb->prefix . "aff_mgr_affiliate_referrals r
+         ON l.id = r.link_id;";
+
+        $results = $wpdb->get_row($query, ARRAY_A);
+
+        return 
+        [
+            'total_links' => isset($results['total_links']) ? intval($results['total_links']) : 0, 
+            'total_campaigns' => isset($results['total_campaigns']) ? intval($results['total_campaigns']) : 0, 
+            'total_clicks'=> isset($results['total_clicks']) ? intval($results['total_clicks']) : 0,
+            'total_conversions'=>0,
+            'total_revenue' => 0,
+            'total_cost' => 0,
+            'total_roi' => 0
+        ];
+
+    }
+
+
+
+    public function get_recent_activity($limit = 10)
+    {
+        global $wpdb;
+        $referral_table = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
     $links_table = $wpdb->prefix . 'aff_mgr_affiliate_links';
 
     $query = "
@@ -52,65 +111,5 @@ public function get_recent_activity($limit = 10)
     $results = $wpdb->get_results($wpdb->prepare($query, $limit));
 
     return $results;
-}
-
-
-public function track_referral($link_id, $source)
-{
-    global $wpdb;
-    $referral_table = $wpdb->prefix . 'aff_mgr_affiliate_referrals';
-
-    $wpdb->insert($referral_table, [
-        'link_id' => $link_id,
-        'source' => $source,
-        'created_at' => current_time('mysql')
-    ], ['%d', '%s', '%s']);
-}
-
-
-    /**
-     * Get a summary of all metrics.
-     *
-     * @return array
-     */
-    public function get_metrics_summary()
-    {
-        global $wpdb;
-
-        $query = "SELECT 
-                    SUM(clicks) AS total_clicks, 
-                    SUM(conversions) AS total_conversions, 
-                    SUM(revenue) AS total_revenue, 
-                    SUM(cost) AS total_cost, 
-                    CASE WHEN SUM(cost) > 0 THEN ((SUM(revenue) - SUM(cost)) / SUM(cost)) * 100 ELSE 0 END AS total_roi
-                  FROM {$this->table_name}";
-
-        $results = $wpdb->get_row($query, ARRAY_A);
-
-        return [
-            'total_clicks' => isset($results['total_clicks']) ? intval($results['total_clicks']) : 0,
-            'total_conversions' => isset($results['total_conversions']) ? intval($results['total_conversions']) : 0,
-            'total_revenue' => isset($results['total_revenue']) ? floatval($results['total_revenue']) : 0.0,
-            'total_cost' => isset($results['total_cost']) ? floatval($results['total_cost']) : 0.0,
-            'total_roi' => isset($results['total_roi']) ? floatval($results['total_roi']) : 0.0
-        ];
-    }
-
-    /**
-     * Get detailed metrics for a specific campaign.
-     *
-     * @param int $campaign_id
-     * @return array
-     */
-    public function get_campaign_metrics($campaign_id)
-    {
-        global $wpdb;
-        
-        $query = $wpdb->prepare(
-            "SELECT * FROM {$this->table_name} WHERE campaign_id = %d",
-            $campaign_id
-        );
-
-        return $wpdb->get_results($query, ARRAY_A);
     }
 }

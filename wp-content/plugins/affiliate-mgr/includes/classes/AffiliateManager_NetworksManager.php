@@ -12,6 +12,13 @@ class AffiliateManager_NetworksManager
         $this->table_name = $wpdb->prefix . 'aff_mgr_affiliate_networks';
     }
 
+    public function get_active_networks()
+    {
+        global $wpdb;
+        $query = "SELECT network_name, id FROM {$this->table_name} WHERE enabled = 1  ORDER BY network_name asc";
+        return $wpdb->get_results($query);
+    }
+
     // Method to get all networks
     public function get_all_networks()
     {

@@ -38,35 +38,40 @@ $activeNetworks = $networksManager->get_active_networks();
     <?php $index = 0; ?>
     <?php foreach ($activeNetworks as $network) : ?>
     <div id="<?php echo esc_html($network->network_name) ?>" class="tab-content <?php if($index === 0) echo("active"); ?>">
-        <label class="activity-label"><?php echo esc_html(ucfirst($network->network_name)) ?> Activity</label>  
+        <label><?php echo esc_html(ucfirst($network->network_name)) ?> Activity</label>  
         <table class="wp-list-table widefat fixed striped">
         <thead>
-        <tr>
-            <th title="When the link was created"><?php esc_html_e('Created Date', 'affiliate-manager'); ?></th>
-            <th title="The part after the domain name /offers/ (or whatever the configured word is)"><?php esc_html_e('Shortcode', 'affiliate-manager'); ?></th>
-            <th title="The name of the campaign that this link falls under. Eg a QR code one to see hits from those"><?php esc_html_e('Campaign', 'affiliate-manager'); ?></th>
-            <th title="The number of times this link has been recorded by the site"><?php esc_html_e('Hits', 'affiliate-manager'); ?></th>
-            <th title="When the recorded hit was made"><?php esc_html_e('Hit Date', 'affiliate-manager'); ?></th>
-            <th title="Where the person or agent was before navigating to the url"><?php esc_html_e('Source', 'affiliate-manager'); ?></th>
-            <th title="Any QR code that has been created for this link; useful in conjunction with a QR code campaign "><?php esc_html_e('QR Code', 'affiliate-manager'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
+            <tr>
+                <th><?php esc_html_e('Created Date', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('Shortcode', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('Campaign', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('Category', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('Hits', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('Hit Date', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('Source', 'affiliate-manager'); ?></th>
+                <th><?php esc_html_e('QR Code', 'affiliate-manager'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
     <?php if (!empty($recent_activity)) : ?>
-            <td><?php echo esc_html($activity->created_at) ?? ""; ?></td>
-            <td><?php echo esc_html($activity->short_code) ?? ""; ?></td>
-            <td><?php echo esc_html($activity->campaign) ?? ""; ?></td>
-            <td><?php echo esc_html($activity->hits) ?? ""; ?></td>
-            <td><?php echo esc_html($activity->hit_date) ?? ""; ?></td>
-            <td><?php echo esc_html($activity->hit_source) ?? ""; ?></td>
-            <td><img src="..\assets\images\qrCodePlaceholder.png" alt="QR Code" width="50"></td><!-- todo actual qr code-->
-     <?php else : ?>
-        <tr>
-            <td colspan="7"><?php esc_html_e('No recent activity.', 'affiliate-manager'); ?></td>
-        </tr>
-    <?php endif ?>
-    </tbody>
-        </table>
+        <?php foreach ($recent_activity as $activity) : ?>
+            <tr>
+                    <td><?php echo esc_html($activity->created_at) ?? ""; ?></td>
+                    <td><?php echo esc_html($activity->short_code) ?? ""; ?></td>
+                    <td><?php echo esc_html($activity->campaign) ?? ""; ?></td>
+                    <td><?php echo esc_html($activity->category) ?? ""; ?></td>
+                    <td><?php echo esc_html($activity->hits) ?? ""; ?></td>
+                    <td><?php echo esc_html($activity->hit_date) ?? ""; ?></td>
+                    <td><?php echo esc_html($activity->hit_source) ?? ""; ?></td>
+                    <td><img src="..\assets\images\qrCodePlaceholder.png" alt="QR Code" width="50"></td><!-- todo actual qr code-->
+                </tr>
+        <?php endforeach;?>
+        <?php else : ?>
+            <tr>
+                <td colspan="4"><?php esc_html_e('No recent activity.', 'affiliate-manager'); ?></td>
+            </tr>
+    <?php endif; ?>
+        </tbody>
     </div>
         <?php $index = $index+1; ?>
     <? endforeach; ?>  

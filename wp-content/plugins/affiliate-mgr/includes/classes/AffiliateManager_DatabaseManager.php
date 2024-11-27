@@ -32,6 +32,7 @@ class AffiliateManager_DatabaseManager
             link_id mediumint(9) NOT NULL,
             source varchar(2048) NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            hits BIGINT DEFAULT 0
             PRIMARY KEY  (id)
         ) $charset_collate;";
     
@@ -241,12 +242,13 @@ private function create_categories_table()
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             network_name varchar(255) NOT NULL,
             description text,
+            enabled tinyint(1) NOT NULL DEFAULT 1,
             api_key varchar(255) NULL,
             client_id varchar(255) NULL,
             client_secret varchar(255) NULL,
             access_token text NULL,
             url VARCHAR(2048) NULL,--eg clickbank.com
-            PRIMARY KEY  (id)
+            PRIMARY KEY (id)
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
