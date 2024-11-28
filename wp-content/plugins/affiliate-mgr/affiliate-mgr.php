@@ -76,14 +76,24 @@ function affiliate_manager_enqueue_admin_assets() {
     $screen = get_current_screen();
     //error_log('Current Screen ID: ' . $screen->id);
 
+    wp_enqueue_script(
+        'affiliate-manager-utils-script', // Unique handle for dashboard script
+         plugin_dir_url(__FILE__) . 'assets/js/am.utils.js',
+        [],
+        '1.0.0',
+        true
+     );
+
+     wp_enqueue_style(
+        'affiliate-manager-admin-style', // Handle (unique identifier)
+        plugin_dir_url(__FILE__) . 'assets/css/admin-style.css'
+    );
+
     // Enqueue styles and scripts based on the screen ID
 
     // For the settings page
     if ( $screen->id === 'toplevel_page_affiliate_manager_settings' ) {
-        wp_enqueue_style(
-            'affiliate-manager-admin-style', // Handle (unique identifier)
-            plugin_dir_url(__FILE__) . 'assets/css/admin-style.css'
-        );
+        
         wp_enqueue_script(
             'affiliate-manager-validation', // Handle for validation script
             plugin_dir_url(__FILE__) . 'assets/js/am.validation.js',
@@ -92,6 +102,8 @@ function affiliate_manager_enqueue_admin_assets() {
             true
         );
     }
+
+    
 
     // For the dashboard page
     if ( $screen->id === 'toplevel_page_affiliate_manager_dashboard' ) {
@@ -106,7 +118,24 @@ function affiliate_manager_enqueue_admin_assets() {
             '1.0.0',
             true
         );
+ 
     }
+
+    //links page
+    if ( $screen->id === 'affiliate-manager_page_affiliate_manager_links'){
+        wp_enqueue_style(
+            'affiliate-manager-links-style', // Unique handle for links style
+            plugin_dir_url(__FILE__) . 'assets/css/links-management.css'
+        );
+        wp_enqueue_script(
+            'affiliate-manager-links-script', // Unique handle for links script
+             plugin_dir_url(__FILE__) . 'assets/js/am.links.js',
+            [],
+            '1.0.0',
+            true
+         );
+    }
+   
 }
 add_action('admin_enqueue_scripts', 'affiliate_manager_enqueue_admin_assets');
 

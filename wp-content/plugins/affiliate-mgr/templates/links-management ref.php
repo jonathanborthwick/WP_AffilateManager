@@ -98,45 +98,24 @@ $campaigns = $campaign_manager->get_all_campaigns();
     </form>
 
     <h2>Existing Links</h2>
-   <p>Grouped by network</p>
-    <div class="tab-container">
-        <?php if (!empty($networks)) : ?>
-            <?php 
-                $index = 0;
-                foreach ($networks as $network) : ?>
-        <div class="tab <?php if($index === 0) echo("active"); ?>" data-tab="<?php echo esc_html($network->network_name) ?>" onclick="am.utils.showTab('<?php echo esc_html($network->network_name) ?>')"><?php echo esc_html(ucfirst($network->network_name)) ?></div>
-            <?php $index = $index+1;
-               endforeach; 
-            ?>
-            <?php endif; ?>
-    </div>
-    <?php $index = 0; ?>
-    <?php foreach ($networks as $network) : ?>
-        <div id="<?php echo esc_html($network->network_name) ?>" class="tab-content <?php if($index === 0) echo("active"); ?>"> 
-           <label class="activity-label"><?php echo esc_html(ucfirst($network->network_name)) ?> Activity</label>
-           <table class="wp-list-table widefat fixed striped">
-              <thead>
-                 <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Link Name</th>
-                    <th scope="col">URL</th>
-                    <th scope="col">Shortcode</th>
-                    <th scope="col">Affiliate Network</th>
-                    <th scope="col">Campaign</th>
-                    <th scope="col">QR Code</th>
-                    <th scope="col">Actions</th>
-                 </tr>
-              </thead>
-              <tbody>
-              <?php if (!empty($links)) : ?>
-                <?php $networkname = $network->network_name ?>
-                <?php $thisNetworkLinkData = array_filter($links, function($link) use ($networkname) {
-                    return $link->network_name === $networkname;
-                }); ?>
-                <?php foreach ($thisNetworkLinkData as $link) : ?>
-                    <?php $networkname = $link->network_name ?>
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Link Name</th>
+                <th scope="col">URL</th>
+                <th scope="col">Shortcode</th>
+                <th scope="col">Affiliate Network</th>
+                <th scope="col">Campaign</th>
+                <th scope="col">QR Code</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($links)) : ?>
+                <?php foreach ($links as $link) : ?>
                     <tr>
-                    <td><?php echo esc_html($link->id); ?></td>
+                        <td><?php echo esc_html($link->id); ?></td>
                         <td><?php echo esc_html($link->link_name); ?></td>
                         <td><a href="<?php echo esc_url($link->url); ?>" target="_blank"><?php echo esc_html($link->url); ?></a></td>
                         <td><?php echo esc_html($link->short_code); ?></td>
@@ -160,12 +139,12 @@ $campaigns = $campaign_manager->get_all_campaigns();
                             <a href="admin.php?page=affiliate_manager_links&action=delete&id=<?php echo esc_attr($link->id); ?>" class="button button-danger" onclick="return confirm('Are you sure you want to delete this link?');">Delete</a>
                         </td>
                     </tr>
-                <?php endforeach ?>
-              <?php endif ?>
-              </tbody>
-           </table>
-        </div>
-        <?php $index = $index+1; ?>
-    <?php endforeach ?>
-
+                <?php endforeach; ?>
+            <?php else : ?>
+                <tr>
+                    <td colspan="7">No affiliate links found.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </div>

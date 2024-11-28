@@ -4,7 +4,7 @@
     am.dashboard = (function(){
         var context = {};
 
-        //placeholder for dashboard-specific javascript
+        //placeholder for links-specific javascript
 
         return context;
     })();

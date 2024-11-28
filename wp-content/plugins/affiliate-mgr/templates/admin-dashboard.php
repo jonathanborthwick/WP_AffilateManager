@@ -28,7 +28,7 @@ $activeNetworks = $networksManager->get_active_networks();
             <?php 
                 $index = 0;
                 foreach ($activeNetworks as $network) : ?>
-        <div class="tab <?php if($index === 0) echo("active"); ?>" data-tab="<?php echo esc_html($network->network_name) ?>" onclick="am.dashboard.showTab('<?php echo esc_html($network->network_name) ?>')"><?php echo esc_html(ucfirst($network->network_name)) ?></div>
+        <div class="tab <?php if($index === 0) echo("active"); ?>" data-tab="<?php echo esc_html($network->network_name) ?>" onclick="am.utils.showTab('<?php echo esc_html($network->network_name) ?>')"><?php echo esc_html(ucfirst($network->network_name)) ?></div>
             <?php $index = $index+1;
                endforeach; 
             ?>
@@ -59,7 +59,7 @@ $activeNetworks = $networksManager->get_active_networks();
             <td><?php echo esc_html($activity->hits) ?? ""; ?></td>
             <td><?php echo esc_html($activity->hit_date) ?? ""; ?></td>
             <td><?php echo esc_html($activity->hit_source) ?? ""; ?></td>
-            <td><img src="..\assets\images\qrCodePlaceholder.png" alt="QR Code" width="50"></td><!-- todo actual qr code-->
+            <td><img title="Placeholder image only. Still working on QR code functionality" src="../wp-content/plugins/affiliate-mgr/assets/images/qrCodePlaceholder.png" alt="QR Code" width="50"></td><!-- todo actual qr code-->
      <?php else : ?>
         <tr>
             <td colspan="7"><?php esc_html_e('No recent activity.', 'affiliate-manager'); ?></td>
